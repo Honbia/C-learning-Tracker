@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C# Learning Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f6f5fa;--surface:#fff;--ink:#1d1a26;--muted:#6a6578;--line:#e0dcea;--accent:#6b3fa0;--accent-soft:#ece4f6;--done:#2e7d5b;--done-soft:#e1f2ea;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15121c;--surface:#201c2b;--ink:#f1eef8;--muted:#a49fb4;--line:#322d41;--accent:#b794e8;--accent-soft:#2f2543;--done:#5fcf9c;--done-soft:#1c3329;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15121c;--surface:#201c2b;--ink:#f1eef8;--muted:#a49fb4;--line:#322d41;--accent:#b794e8;--accent-soft:#2f2543;--done:#5fcf9c;--done-soft:#1c3329;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+main{max-width:720px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.05;font-weight:800;margin:8px 0 6px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 20px}
+.hero{background:var(--accent);color:#fff;border-radius:20px;padding:20px;margin-bottom:20px}
+.hero .big{font-size:3.2rem;font-weight:800;line-height:1}
+.hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.hero p{margin:0;opacity:.9}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.28);overflow:hidden;margin-top:14px}
+.bar>i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .35s}
+:root:not([data-theme="light"]) .hero{color:#15121c}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+button{font:inherit;cursor:pointer}
+.chip{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:.9rem}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:16px;display:flex;align-items:center;gap:12px}
+summary::-webkit-details-marker{display:none}
+.ph-title{flex:1;min-width:0}
+.ph-title b{display:block;font-size:1.1rem;font-weight:600}
+.ph-title span{font-size:.85rem;color:var(--muted)}
+.count{font-size:.9rem;font-weight:600;color:var(--accent);white-space:nowrap}
+.mini{height:4px;background:var(--line)}
+.mini>i{display:block;height:100%;background:var(--done);transition:width .35s}
+details.complete{border-color:var(--done)}
+details.complete .count{color:var(--done)}
+ul{list-style:none;margin:0;padding:6px 8px 12px}
+li label{display:flex;gap:12px;align-items:flex-start;padding:10px 8px;border-radius:10px;cursor:pointer}
+li label:hover{background:var(--bg)}
+input[type=checkbox]{appearance:none;flex:none;width:22px;height:22px;margin:1px 0 0;border:2px solid var(--muted);border-radius:7px;display:grid;place-content:center;cursor:pointer;background:var(--surface)}
+input[type=checkbox]:checked{background:var(--done);border-color:var(--done)}
+input[type=checkbox]:checked::after{content:"";width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+li.done .txt{color:var(--muted);text-decoration:line-through}
+li.hide{display:none}
+.tag{font-size:.75rem;font-weight:600;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 8px;margin-left:8px;white-space:nowrap}
+footer{margin-top:28px;color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>C# learning tracker</h1>
+  <p class="sub">Tick things off as you learn them. Your progress saves automatically on this device.</p>
+
+  <section class="hero" aria-live="polite">
+    <div class="row">
+      <div><div class="big" id="pct">0%</div><p id="summary">0 of 0 steps done</p></div>
+      <p id="nextUp"></p>
+    </div>
+    <div class="bar"><i id="barFill" style="width:0%"></i></div>
+  </section>
+
+  <div class="tools">
+    <button class="chip" id="hideDone" aria-pressed="false">Hide completed</button>
+    <button class="chip" id="expand">Expand all</button>
+    <button class="chip" id="collapse">Collapse all</button>
+  </div>
+
+  <div id="phases"></div>
+
+  <footer>
+    <span>Recommended pace: 5–10 hours a week, about 6 months.</span>
+    <button class="link" id="reset">Reset all progress</button>
+  </footer>
+</main>
+
+<script>
+var PHASES=[
+{t:"Phase 1: Fundamentals",w:"Weeks 1–4",items:[
+"Install the .NET SDK and Visual Studio or VS Code",
+"Write and run your first console app",
+"Variables and data types",
+"Console.ReadLine and Console.WriteLine",
+"Conditionals: if/else and switch",
+"Loops: for, while, foreach",
+"Methods (C#’s functions)",
+["Project: number guessing game",1],
+["Project: calculator",1],
+["Project: text-based quiz",1]]},
+{t:"Phase 2: Core skills",w:"Weeks 5–8",items:[
+"Arrays",
+"List<T>",
+"Dictionary<TKey, TValue>",
+"Strings and string manipulation",
+"Reading and writing files",
+"Exception handling with try/catch",
+"Debugging with breakpoints",
+["Project: contact book saved to a file",1],
+["Project: expense tracker",1],
+["Project: to-do list app",1]]},
+{t:"Phase 3: Object-oriented programming",w:"Weeks 9–12",items:[
+"Classes and objects",
+"Properties and constructors",
+"Encapsulation",
+"Inheritance",
+"Polymorphism",
+"Interfaces",
+"Enums and structs",
+"Basic generics",
+["Project: bank account system",1],
+["Project: library management app",1],
+["Project: inventory system",1]]},
+{t:"Phase 4: Intermediate C#",w:"Weeks 13–16",items:[
+"LINQ: querying collections",
+"Lambdas and delegates",
+"Nullable types and null handling",
+"async and await basics",
+"Git basics: commit, branch, push",
+"Create a GitHub account",
+["Project: upload 2–3 projects to GitHub with READMEs",1]]},
+{t:"Phase 5: Specialize",w:"Weeks 17–24 (pick one track)",items:[
+"Choose a track: web/backend, games, or desktop",
+"Web: ASP.NET Core Web API",
+"Web: Entity Framework Core",
+"Web: SQL basics",
+"Games: complete the Unity Learn beginner pathway",
+"Desktop: learn WPF or .NET MAUI",
+["Project: one larger app, start to finish",1]]},
+{t:"Phase 6: Level up",w:"Ongoing",items:[
+"Unit testing with xUnit",
+"Dependency injection",
+"Clean code principles",
+"Basic data structures and algorithms",
+"Read other people’s code",
+"Contribute to an open-source project",
+"Apply for roles, internships, or freelance work"]}
+];
+var KEY="csharp-tracker-v1",state={},hideDone=false,openSet={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){state={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+var wrap=document.getElementById("phases");
+PHASES.forEach(function(p,pi){
+  var d=document.createElement("details");d.dataset.pi=pi;
+  var html='<summary><div class="ph-title"><b></b><span></span></div><div class="count"></div></summary><div class="mini"><i></i></div><ul>';
+  p.items.forEach(function(it,ii){
+    var proj=Array.isArray(it),txt=proj?it[0]:it,id=pi+"-"+ii;
+    html+='<li data-id="'+id+'"><label><input type="checkbox"><span class="txt"></span></label></li>';
+  });
+  d.innerHTML=html+'</ul>';
+  d.querySelector("b").textContent=p.t;
+  d.querySelector(".ph-title span").textContent=p.w;
+  d.querySelectorAll("li").forEach(function(li,ii){
+    var it=p.items[ii],proj=Array.isArray(it);
+    var s=li.querySelector(".txt");s.textContent=proj?it[0].replace("Project: ",""):it;
+    if(proj){var t=document.createElement("span");t.className="tag";t.textContent="Project";s.after(t)}
+    li.querySelector("input").addEventListener("change",function(e){
+      if(e.target.checked)state[li.dataset.id]=1;else delete state[li.dataset.id];
+      save();render();
+    });
+  });
+  d.addEventListener("toggle",function(){openSet[pi]=d.open});
+  wrap.appendChild(d);
+});
+function render(){
+  var total=0,done=0,next=null;
+  document.querySelectorAll("details").forEach(function(d){
+    var pi=+d.dataset.pi,pt=0,pd=0;
+    d.querySelectorAll("li").forEach(function(li){
+      var on=!!state[li.dataset.id];
+      li.querySelector("input").checked=on;
+      li.classList.toggle("done",on);
+      li.classList.toggle("hide",on&&hideDone);
+      pt++;if(on)pd++;
+      if(!on&&!next)next=li.querySelector(".txt").textContent;
+    });
+    total+=pt;done+=pd;
+    d.querySelector(".count").textContent=pd+"/"+pt;
+    d.querySelector(".mini i").style.width=(pd/pt*100)+"%";
+    d.classList.toggle("complete",pd===pt);
+  });
+  var pct=Math.round(done/total*100);
+  document.getElementById("pct").textContent=pct+"%";
+  document.getElementById("barFill").style.width=pct+"%";
+  document.getElementById("summary").textContent=done+" of "+total+" steps done";
+  document.getElementById("nextUp").textContent=next?"Next up: "+next:"Everything is done. Keep building!";
+}
+document.getElementById("hideDone").addEventListener("click",function(e){
+  hideDone=!hideDone;e.target.setAttribute("aria-pressed",hideDone);render();
+});
+document.getElementById("expand").addEventListener("click",function(){document.querySelectorAll("details").forEach(function(d){d.open=true})});
+document.getElementById("collapse").addEventListener("click",function(){document.querySelectorAll("details").forEach(function(d){d.open=false})});
+document.getElementById("reset").addEventListener("click",function(){
+  if(confirm("Reset all progress? This can’t be undone.")){state={};save();render()}
+});
+render();
+var first=document.querySelectorAll("details"),opened=false;
+first.forEach(function(d){
+  if(!opened&&d.querySelectorAll("li").length&&!d.classList.contains("complete")){d.open=true;opened=true}
+});
+</script>
+</body>
+</html>
